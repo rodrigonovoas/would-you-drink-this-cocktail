@@ -20,6 +20,8 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCock
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val viewModel = MainActivityViewModel()
+
         super.onCreate(savedInstanceState)
         setContent {
             WouldYouDrinkThisCocktailTheme {
