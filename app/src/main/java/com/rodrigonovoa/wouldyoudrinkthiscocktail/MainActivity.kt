@@ -5,15 +5,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,14 +50,20 @@ private fun BaseView(data: State<DrinksResponse?>) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Title()
-            Cocktail(data)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Title()
+                Cocktail(data)
+                BottomButtons()
+            }
         }
     }
 }
@@ -91,6 +98,7 @@ fun Cocktail(data: State<DrinksResponse?>) {
     Text(
         text = "${drink?.strDrink}",
         fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
         modifier = Modifier
             .padding(top = 8.dp)
     )
@@ -110,6 +118,7 @@ fun DrinkProperty(label: String? = null, text: String?, isTitle: Boolean = false
     Text(
         text = "$labelText$text",
         style = style,
+        fontSize = 16.sp,
         modifier = Modifier.padding(top = 8.dp)
     )
 }
@@ -119,16 +128,79 @@ fun DrinkInstructions(instructions: String?) {
     Text(
         text = "Instructions",
         style = TextStyle(textDecoration = TextDecoration.Underline),
-        modifier = Modifier.padding(top = 8.dp)
+        fontSize = 16.sp,
+        modifier = Modifier.padding(top = 16.dp)
     )
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
+            .padding(4.dp)
     ) {
-        Text(text = instructions ?: "")
+        Text(
+            text = instructions ?: "",
+            fontSize = 16.sp
+        )
+    }
+}
+
+@Composable
+fun BottomButtons() {
+    Row(
+        modifier = Modifier.padding(top = 32.dp)
+    ){
+        DislikeButton()
+        Spacer(modifier = Modifier.width(16.dp))
+        LikeButton()
+    }
+}
+
+@Composable
+fun DislikeButton() {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(Color.Red, Color.Red, Color.Red)
+    )
+
+    OutlinedButton(
+        onClick = { },
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.Red
+        ),
+        border = ButtonDefaults.outlinedBorder.copy(
+            width = 3.dp,
+            brush = gradientBrush
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .defaultMinSize(minWidth = 125.dp)
+            .padding(8.dp)
+    ) {
+        Text("DISLIKE")
+    }
+}
+
+@Composable
+fun LikeButton() {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(Color.Green, Color.Green, Color.Green)
+    )
+
+    OutlinedButton(
+        onClick = { },
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.Green
+        ),
+        border = ButtonDefaults.outlinedBorder.copy(
+            width = 3.dp,
+            brush = gradientBrush
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .defaultMinSize(minWidth = 125.dp)
+            .padding(8.dp)
+    ) {
+        Text("LIKE")
     }
 }
 
