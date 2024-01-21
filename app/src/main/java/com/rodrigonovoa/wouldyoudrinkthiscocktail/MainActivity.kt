@@ -72,9 +72,11 @@ fun Title() {
 
 @Composable
 fun Cocktail(data: State<DrinksResponse?>) {
+    val drink = data.value?.drinks?.get(0)
+
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(data.value?.drinks?.get(0)?.strDrinkThumb)
+            .data(drink?.strDrinkThumb)
             .crossfade(true)
             .build(),
         contentDescription = null,
@@ -87,40 +89,46 @@ fun Cocktail(data: State<DrinksResponse?>) {
     )
 
     Text(
-        text = "${data.value?.drinks?.get(0)?.strDrink}",
+        text = "${drink?.strDrink}",
         fontWeight = FontWeight.Bold,
         modifier = Modifier
             .padding(top = 8.dp)
     )
 
-    Text(
-        text = "Category: ${data.value?.drinks?.get(0)?.strCategory}",
-        modifier = Modifier
-            .padding(top = 8.dp)
-    )
+    DrinkProperty(label = "Category", text = drink?.strCategory)
+
+    DrinkProperty(label = "Type", text = drink?.strAlcoholic)
+
+    DrinkInstructions(drink?.strInstructions)
+}
+
+@Composable
+fun DrinkProperty(label: String? = null, text: String?, isTitle: Boolean = false) {
+    val style = if (isTitle) TextStyle(fontWeight = FontWeight.Bold) else TextStyle.Default
+    val labelText = if (label != null) "$label: " else ""
 
     Text(
-        text = "Type: ${data.value?.drinks?.get(0)?.strAlcoholic}",
-        modifier = Modifier
-            .padding(top = 8.dp)
+        text = "$labelText$text",
+        style = style,
+        modifier = Modifier.padding(top = 8.dp)
     )
+}
 
+@Composable
+fun DrinkInstructions(instructions: String?) {
     Text(
         text = "Instructions",
         style = TextStyle(textDecoration = TextDecoration.Underline),
-        modifier = Modifier
-            .padding(top = 8.dp)
+        modifier = Modifier.padding(top = 8.dp)
     )
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
     ) {
-        Text(
-            text = "${data.value?.drinks?.get(0)?.strInstructions}",
-            modifier = Modifier
-                .padding(top = 4.dp)
-        )
+        Text(text = instructions ?: "")
     }
 }
 
