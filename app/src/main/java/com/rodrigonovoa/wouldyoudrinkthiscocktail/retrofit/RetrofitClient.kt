@@ -28,7 +28,7 @@ object RetrofitClient {
         .client(client)
         .build()
 
-    fun getCoffeeApiService(): TheCocktailDbService? {
+    fun getDrinkApiService(): TheCocktailDbService? {
         try {
             return retrofit.create(TheCocktailDbService::class.java)
         } catch (e: Exception) {
