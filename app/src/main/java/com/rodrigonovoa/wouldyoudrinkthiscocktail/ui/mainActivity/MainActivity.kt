@@ -1,4 +1,4 @@
-package com.rodrigonovoa.wouldyoudrinkthiscocktail
+package com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.mainActivity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,26 +25,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewModel = MainActivityViewModel()
-
         super.onCreate(savedInstanceState)
         setContent {
             WouldYouDrinkThisCocktailTheme {
-                BaseView(
-                    data = viewModel.drink
-                )
+                BaseView()
             }
         }
     }
 }
 
 @Composable
-private fun BaseView(data: State<DrinksResponse?>) {
+private fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
+    val data by viewModel.drink.collectAsState(initial = DrinksResponse(listOf()))
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
@@ -63,7 +60,9 @@ private fun BaseView(data: State<DrinksResponse?>) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Title()
-                Cocktail(data)
+                if (data.drinks.isNotEmpty()) {
+                    Cocktail(data)
+                }
                 BottomButtons()
             }
         }
@@ -80,8 +79,8 @@ fun Title() {
 }
 
 @Composable
-fun Cocktail(data: State<DrinksResponse?>) {
-    val drink = data.value?.drinks?.get(0)
+fun Cocktail(data: DrinksResponse) {
+    val drink = data.drinks?.get(0)
 
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
@@ -211,9 +210,7 @@ fun LikeButton() {
 @Preview(showBackground = true)
 @Composable
 fun MainActivityPreview() {
-    val data: MutableState<DrinksResponse?> = mutableStateOf(null)
-
     WouldYouDrinkThisCocktailTheme {
-        BaseView(data)
+        BaseView()
     }
 }
