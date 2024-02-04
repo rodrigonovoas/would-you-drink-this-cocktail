@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -90,9 +92,10 @@ fun Cocktail(data: State<DrinksResponse?>) {
         error = painterResource(R.drawable.placeholder),
         contentScale = ContentScale.Crop,
         modifier = Modifier
-            .width(200.dp)
-            .height(200.dp)
+            .width(225.dp)
+            .height(225.dp)
             .padding(top = 16.dp)
+            .clip(CircleShape)
     )
 
     Text(
@@ -100,7 +103,7 @@ fun Cocktail(data: State<DrinksResponse?>) {
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         modifier = Modifier
-            .padding(top = 8.dp)
+            .padding(top = 16.dp)
     )
 
     DrinkProperty(label = "Category", text = drink?.strCategory)
@@ -129,7 +132,7 @@ fun DrinkInstructions(instructions: String?) {
         text = "Instructions",
         style = TextStyle(textDecoration = TextDecoration.Underline),
         fontSize = 16.sp,
-        modifier = Modifier.padding(top = 16.dp)
+        modifier = Modifier.padding(top = 8.dp)
     )
 
     Box(
@@ -148,7 +151,7 @@ fun DrinkInstructions(instructions: String?) {
 @Composable
 fun BottomButtons() {
     Row(
-        modifier = Modifier.padding(top = 32.dp)
+        modifier = Modifier.padding(top = 24.dp)
     ){
         DislikeButton()
         Spacer(modifier = Modifier.width(16.dp))
