@@ -4,15 +4,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.TheCocktailDbRepository
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.ApiResult
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel(val repository: TheCocktailDbRepository): ViewModel() {
-    private val _drink = MutableStateFlow(DrinksResponse(listOf()))
-    val drink: Flow<DrinksResponse> = _drink
-
+class MainActivityViewModel(private val getCocktailUseCase: GetCocktailUseCase) : ViewModel() {
+    private val _drink = MutableStateFlow<ApiResult<DrinksResponse?>>(ApiResult.loading())
+    val drink: Flow<ApiResult<DrinksResponse?>> = _drink
     var isLoading = mutableStateOf(false)
 
     init {
@@ -20,13 +20,10 @@ class MainActivityViewModel(val repository: TheCocktailDbRepository): ViewModel(
     }
 
     private fun getDrinkFromAPI() {
-        isLoading.value = true
         viewModelScope.launch {
-            isLoading.value = false
-            repository.getCocktail().collect() {
-                it?.let {
-                    _drink.value = it
-                }
+            getCocktailUseCase().collect { result ->
+                _drink.value = result
+                isLoading.value = result.status == ApiResult.Status.LOADING
             }
         }
     }

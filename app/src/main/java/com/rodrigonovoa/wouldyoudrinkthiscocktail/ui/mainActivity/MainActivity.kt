@@ -28,6 +28,7 @@ import coil.request.ImageRequest
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.ApiResult
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
-    val data by viewModel.drink.collectAsState(initial = DrinksResponse(listOf()))
+    val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -60,9 +61,9 @@ private fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Title()
-                if (data.drinks.isNotEmpty()) {
-                    Cocktail(data)
-                }
+
+                CocktailResponseManager(state)
+
                 BottomButtons()
             }
         }
@@ -76,6 +77,27 @@ fun Title() {
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold
     )
+}
+
+@Composable
+fun CocktailResponseManager(state: ApiResult<DrinksResponse?>) {
+    when (state.status) {
+        ApiResult.Status.SUCCESS -> {
+            state.data?.let {
+                if (it.drinks.isNotEmpty()) {
+                    Cocktail(it)
+                } else {
+                    Text("DRINKS UNAVAILABLE")
+                }
+            }
+        }
+        ApiResult.Status.ERROR -> {
+            Text(text = "Error: ${state.message}")
+        }
+        ApiResult.Status.LOADING -> {
+            CircularProgressIndicator()
+        }
+    }
 }
 
 @Composable
