@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.ApiResult
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.api.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

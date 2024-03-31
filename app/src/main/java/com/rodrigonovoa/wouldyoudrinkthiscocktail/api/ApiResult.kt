@@ -1,4 +1,4 @@
-package com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase
+package com.rodrigonovoa.wouldyoudrinkthiscocktail.api
 
 data class ApiResult<out T>(val status: Status, val data: T?, val message: String?) {
     companion object {

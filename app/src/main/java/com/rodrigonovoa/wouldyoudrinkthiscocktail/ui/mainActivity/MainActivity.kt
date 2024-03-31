@@ -28,7 +28,7 @@ import coil.request.ImageRequest
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.ApiResult
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.api.ApiResult
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
+ fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
     val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
 
     Surface(
