@@ -1,10 +1,10 @@
-package com.rodrigonovoa.wouldyoudrinkthiscocktail.data
+package com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api
 
 data class DrinksResponse(
-    val drinks: List<Drink>
+    val drinks: List<DrinkResponse>
 )
 
-data class Drink(
+data class DrinkResponse(
     val idDrink: String,
     val strDrink: String,
     val strDrinkAlternate: String?,

@@ -1,7 +1,7 @@
 package com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase
 
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.api.ApiResult
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.TheCocktailDbRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

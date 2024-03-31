@@ -2,7 +2,7 @@ package com.rodrigonovoa.wouldyoudrinkthiscocktail
 
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.TheCocktailDbRepository
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.api.ApiResult
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf

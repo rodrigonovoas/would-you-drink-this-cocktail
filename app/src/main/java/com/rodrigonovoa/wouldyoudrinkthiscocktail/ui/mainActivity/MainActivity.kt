@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.api.ApiResult
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -64,7 +64,10 @@ class MainActivity : ComponentActivity() {
 
                 CocktailResponseManager(state)
 
-                BottomButtons()
+                BottomButtons(
+                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
+                    onLikeButtonClick = {  }
+                )
             }
         }
     }
@@ -170,24 +173,27 @@ fun DrinkInstructions(instructions: String?) {
 }
 
 @Composable
-fun BottomButtons() {
+fun BottomButtons(
+    onDislikeButtonClick: () -> Unit,
+    onLikeButtonClick: () -> Unit
+) {
     Row(
         modifier = Modifier.padding(top = 24.dp)
     ){
-        DislikeButton()
+        LikeButton(onLikeButtonClick)
         Spacer(modifier = Modifier.width(16.dp))
-        LikeButton()
+        DislikeButton(onDislikeButtonClick)
     }
 }
 
 @Composable
-fun DislikeButton() {
+fun DislikeButton(onClick: () -> Unit) {
     val gradientBrush = Brush.linearGradient(
         colors = listOf(Color.Red, Color.Red, Color.Red)
     )
 
     OutlinedButton(
-        onClick = { },
+        onClick = { onClick.invoke() },
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = Color.Red
         ),
@@ -205,13 +211,13 @@ fun DislikeButton() {
 }
 
 @Composable
-fun LikeButton() {
+fun LikeButton(onClick: () -> Unit) {
     val gradientBrush = Brush.linearGradient(
         colors = listOf(Color.Green, Color.Green, Color.Green)
     )
 
     OutlinedButton(
-        onClick = { },
+        onClick = { onClick.invoke() },
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = Color.Green
         ),
