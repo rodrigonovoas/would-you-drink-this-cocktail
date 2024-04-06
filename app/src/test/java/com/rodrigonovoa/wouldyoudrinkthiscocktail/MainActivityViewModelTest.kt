@@ -89,6 +89,15 @@ class MainActivityViewModelTest {
         Assert.assertTrue(mainActivityViewModel.drinkInserted.first() == false)
     }
 
+    @Test
+    fun `resetDrinkInserted turns _drinkInserted into FALSE`() = runTest {
+        // When & Then
+        mainActivityViewModel.resetDrinkInserted()
+
+        // Assert
+        Assert.assertTrue(mainActivityViewModel.drinkInserted.first() == false)
+    }
+
 }
 
 @ExperimentalCoroutinesApi
