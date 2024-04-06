@@ -5,8 +5,8 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.db.Drink
 
 @Dao
 interface DrinkDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDrink(drink: Drink)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertDrink(drink: Drink): Long
 
     @Update
     suspend fun updateDrink(drink: Drink)

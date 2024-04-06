@@ -1,5 +1,7 @@
 package com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api
 
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.db.Drink
+
 data class DrinksResponse(
     val drinks: List<DrinkResponse>
 )
@@ -32,4 +34,14 @@ data class DrinkResponse(
     val strImageAttribution: String?,
     val strCreativeCommonsConfirmed: String,
     val dateModified: String
-)
+) {
+    fun fromResponseToDrink(): Drink {
+        return Drink(
+            idDrink,
+            strDrink,
+            strCategory,
+            strAlcoholic,
+            strInstructions
+        )
+    }
+}

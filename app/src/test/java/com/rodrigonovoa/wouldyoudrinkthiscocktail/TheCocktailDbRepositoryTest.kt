@@ -1,7 +1,7 @@
 package com.rodrigonovoa.wouldyoudrinkthiscocktail
 
 import android.util.Log
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.DrinksResponse
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.TheCocktailDbRepository
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.retrofit.TheCocktailDbService
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -29,7 +29,9 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
                 BottomButtons(
                     onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
-                    onLikeButtonClick = {  }
+                    onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
                 )
             }
         }
