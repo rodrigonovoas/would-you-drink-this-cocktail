@@ -10,6 +10,7 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.InsertDrinkUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel(
@@ -21,7 +22,7 @@ class MainActivityViewModel(
     val drink: Flow<ApiResult<DrinksResponse?>> = _drink
 
     private val _drinkInserted = MutableStateFlow<Boolean>(false)
-    val drinkInserted: Flow<Boolean> = _drinkInserted
+    val drinkInserted = _drinkInserted.asSharedFlow()
 
     var isLoading = mutableStateOf(false)
 
@@ -46,5 +47,9 @@ class MainActivityViewModel(
                 _drinkInserted.value = result
             }
         }
+    }
+
+    fun resetDrinkInserted() {
+        _drinkInserted.value = false
     }
 }

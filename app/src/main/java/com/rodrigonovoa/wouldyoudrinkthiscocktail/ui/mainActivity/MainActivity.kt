@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,19 +21,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
-import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,13 @@ class MainActivity : ComponentActivity() {
 @Composable
  fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
     val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
+    val showDrinkAddedDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel) {
+        viewModel.drinkInserted.collect() {
+            if (it) { showDrinkAddedDialog.value = true }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -70,6 +79,78 @@ class MainActivity : ComponentActivity() {
                     onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
                     onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
                 )
+            }
+        }
+
+        if (showDrinkAddedDialog.value) {
+            DrinkAddedAlertDialog(
+                onDismissRequest = {
+                    viewModel.resetDrinkInserted()
+                    viewModel.getDrinkFromAPI()
+                    showDrinkAddedDialog.value = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun DrinkAddedAlertDialog(onDismissRequest: () -> Unit) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(Color.Green, Color.Green, Color.Green)
+    )
+
+    Dialog(onDismissRequest = {}) {
+        Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Drink saved",
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold)
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+
+                    Image(
+                        painter = painterResource(R.drawable.ic_ok),
+                        alignment = Alignment.Center,
+                        contentDescription = "",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier.width(128.dp),
+                        onClick = { onDismissRequest.invoke() },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.Green
+                        ),
+                        border = ButtonDefaults.outlinedBorder.copy(
+                            width = 3.dp,
+                            brush = gradientBrush
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text("OK")
+                    }
+                }
             }
         }
     }
