@@ -23,12 +23,16 @@ class MainActivityViewModel(
 
     private val _drink = MutableStateFlow<ApiResult<DrinksResponse?>>(ApiResult.loading())
     val drink: Flow<ApiResult<DrinksResponse?>> = _drink
+    private var _lastDrink: ApiResult<DrinksResponse?> = _drink.value
 
     private val _drinks = MutableStateFlow<List<Drink>>(listOf())
     val drinks: Flow<List<Drink>> = _drinks
 
     private val _drinkInserted = MutableStateFlow<Boolean>(false)
     val drinkInserted = _drinkInserted.asSharedFlow()
+
+    private val _detailMode = MutableStateFlow<Boolean>(false)
+    val detailMode = _detailMode.asSharedFlow()
 
     var isLoading = mutableStateOf(false)
 
@@ -41,6 +45,7 @@ class MainActivityViewModel(
         viewModelScope.launch {
             getCocktailUseCase().collect { result ->
                 _drink.value = result
+                _lastDrink = result
                 isLoading.value = result.status == ApiResult.Status.LOADING
             }
         }
@@ -56,6 +61,7 @@ class MainActivityViewModel(
 
     fun loadDrink(drink: Drink) {
         _drink.value = ApiResult.success( drink.toDrinkResponse() )
+        _detailMode.value = true
     }
 
     fun insertDrink(drink: DrinkResponse?) {
@@ -70,5 +76,13 @@ class MainActivityViewModel(
 
     fun resetDrinkInserted() {
         _drinkInserted.value = false
+    }
+
+    fun closeDetailMode() {
+        _detailMode.value = false
+    }
+
+    fun loadLastDrink() {
+        _drink.value = _lastDrink
     }
 }

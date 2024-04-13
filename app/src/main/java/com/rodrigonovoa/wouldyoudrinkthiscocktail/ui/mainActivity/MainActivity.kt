@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
 @Composable
  fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
     val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
+    val detailModel = viewModel.detailMode.collectAsState(initial = false).value
     val dbDrinks = viewModel.drinks.collectAsState(initial = listOf()).value
     val showDrinkAddedDialog = remember { mutableStateOf(false) }
 
@@ -83,14 +86,40 @@ class MainActivity : ComponentActivity() {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Title()
+                if (detailModel) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ){
+                        IconButton(onClick = {
+                            viewModel.closeDetailMode()
+                            viewModel.loadLastDrink()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Close"
+                            )
+                        }
+                    }
+                }
+
+                if (!detailModel) {
+                    Title()
+                }
 
                 CocktailResponseManager(state)
 
-                BottomButtons(
-                    onDislikeButtonClick = { showSheet = true /* viewModel.getDrinkFromAPI() */ },
-                    onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
-                )
+                if (!detailModel) {
+                    BottomButtons(
+                        onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
+                        onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                MyDrinksButton({ showSheet = true })
             }
         }
 
@@ -326,6 +355,30 @@ fun LikeButton(onClick: () -> Unit) {
             .padding(8.dp)
     ) {
         Text("LIKE")
+    }
+}
+
+@Composable
+fun MyDrinksButton(onClick: () -> Unit) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(Color.Blue, Color.Blue, Color.Blue)
+    )
+
+    OutlinedButton(
+        onClick = { onClick.invoke() },
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.Blue
+        ),
+        border = ButtonDefaults.outlinedBorder.copy(
+            width = 3.dp,
+            brush = gradientBrush
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        Text("MY DRINKS")
     }
 }
 
