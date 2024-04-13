@@ -32,6 +32,7 @@ import coil.request.ImageRequest
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.StoredDrinksBottomSheet
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.theme.WouldYouDrinkThisCocktailTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
 @Composable
  fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
     val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
+    val dbDrinks = viewModel.drinks.collectAsState(initial = listOf()).value
     val showDrinkAddedDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel) {
@@ -61,6 +63,16 @@ class MainActivity : ComponentActivity() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
+        var showSheet by remember { mutableStateOf(false) }
+
+        if (showSheet) {
+            StoredDrinksBottomSheet(
+                dbDrinks,
+                onDismiss = { showSheet = false},
+                onDrinkSelected = { viewModel.loadDrink(it) }
+            )
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
@@ -76,7 +88,7 @@ class MainActivity : ComponentActivity() {
                 CocktailResponseManager(state)
 
                 BottomButtons(
-                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
+                    onDislikeButtonClick = { showSheet = true /* viewModel.getDrinkFromAPI() */ },
                     onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
                 )
             }
@@ -173,7 +185,7 @@ fun CocktailResponseManager(state: ApiResult<DrinksResponse?>) {
                 if (it.drinks.isNotEmpty()) {
                     Cocktail(it)
                 } else {
-                    Text("DRINKS UNAVAILABLE")
+                    Text("DRINK UNAVAILABLE")
                 }
             }
         }

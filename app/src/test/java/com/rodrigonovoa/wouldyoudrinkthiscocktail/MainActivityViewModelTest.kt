@@ -7,6 +7,7 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.db.Drink
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.mainActivity.MainActivityViewModel
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailslDbUseCase
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.InsertDrinkUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,13 +36,15 @@ class MainActivityViewModelTest {
 
     private lateinit var getCocktailUseCase: GetCocktailUseCase
     private lateinit var insertDrinkUseCase: InsertDrinkUseCase
+    private lateinit var getCocktailslDbUseCase: GetCocktailslDbUseCase
     private lateinit var mainActivityViewModel: MainActivityViewModel
 
     @Before
     fun setUp() {
         getCocktailUseCase = Mockito.mock()
+        getCocktailslDbUseCase = Mockito.mock()
         insertDrinkUseCase = Mockito.mock()
-        mainActivityViewModel = MainActivityViewModel(getCocktailUseCase, insertDrinkUseCase)
+        mainActivityViewModel = MainActivityViewModel(getCocktailUseCase, getCocktailslDbUseCase, insertDrinkUseCase)
 
         Dispatchers.setMain(TestCoroutineDispatcher())
     }
@@ -69,7 +72,7 @@ class MainActivityViewModelTest {
     fun `insertDrink with filled DrinkResponse inserts drink successful`() = runTest {
         val mockDrinkResponse = DrinkResponse("", "", "", "",
         "", "")
-        val mockDrink = Drink("", "", "", "", "")
+        val mockDrink = Drink("", "", "", "", "", "")
 
         Mockito.`when`(insertDrinkUseCase.invoke(mockDrink)).thenReturn(flowOf(true))
 

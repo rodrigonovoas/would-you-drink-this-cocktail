@@ -29,7 +29,7 @@ class InsertDrinkUseCaseTest {
 
     @Test
     fun `insert drink in db is success with TRUE`() = runTest {
-        val drink = Drink("","", "", "", "")
+        val drink = Drink("","", "", "", "", "")
 
         Mockito.`when`(dao.insertDrink(drink)).thenReturn(1)
 
@@ -40,7 +40,7 @@ class InsertDrinkUseCaseTest {
 
     @Test
     fun `insert drink in db fails with FALSE`() = runTest {
-        val drink = Drink("","", "", "", "")
+        val drink = Drink("","", "", "", "", "")
 
         Mockito.`when`(dao.insertDrink(drink)).thenReturn(0)
 
@@ -51,7 +51,7 @@ class InsertDrinkUseCaseTest {
 
     @Test
     fun `insert drink in db fails with EXCEPTION`() = runTest {
-        val drink = Drink("","", "", "", "")
+        val drink = Drink("","", "", "", "", "")
 
         Mockito.`when`(dao.insertDrink(drink)).thenThrow(RuntimeException("Database write failure"))
 

@@ -20,7 +20,8 @@ data class DrinkResponse(
             strDrink,
             strCategory,
             strAlcoholic,
-            strInstructions
+            strInstructions,
+            strDrinkThumb
         )
     }
 }

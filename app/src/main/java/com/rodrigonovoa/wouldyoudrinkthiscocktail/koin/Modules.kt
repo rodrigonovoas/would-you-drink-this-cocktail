@@ -8,6 +8,7 @@ import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.TheCocktailDbReposi
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.retrofit.RetrofitClient
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.mainActivity.MainActivityViewModel
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailUseCase
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.GetCocktailslDbUseCase
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.useCase.InsertDrinkUseCase
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -19,6 +20,7 @@ val serviceModules = module {
 val useCaseModules = module {
     factory { GetCocktailUseCase(get()) }
     factory { InsertDrinkUseCase(get()) }
+    factory { GetCocktailslDbUseCase(get()) }
 }
 
 val roomModules  = module {
