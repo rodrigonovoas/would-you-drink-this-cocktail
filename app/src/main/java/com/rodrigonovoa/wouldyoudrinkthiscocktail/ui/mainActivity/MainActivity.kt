@@ -6,19 +6,28 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -109,6 +118,8 @@ class MainActivity : ComponentActivity() {
 
                 CocktailResponseManager(state)
 
+                Spacer(modifier = Modifier.weight(1f))
+
                 if (!detailModel) {
                     BottomButtons(
                         onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
@@ -118,7 +129,10 @@ class MainActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                MyDrinksButton({ showSheet = true })
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    MyDrinksButton({ showSheet = true })
+                }
             }
         }
 
@@ -246,10 +260,18 @@ fun Cocktail(data: DrinksResponse) {
                 .build(),
             contentDescription = null,
             error = painterResource(R.drawable.placeholder),
-            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(225.dp)
+                .clip(
+                    shape = RoundedCornerShape(
+                        topStart = 20.dp,
+                        topEnd = 20.dp,
+                        bottomEnd = 20.dp,
+                        bottomStart = 20.dp
+                    )
+                ) ,
+            contentScale = ContentScale.Crop,
         )
 
         Row(
@@ -289,23 +311,28 @@ fun DrinkProperty(text: String?) {
 
 @Composable
 fun DrinkInstructions(instructions: String?) {
-    Text(
-        text = "Instructions",
-        style = TextStyle(textDecoration = TextDecoration.Underline),
-        fontSize = 20.sp,
-        modifier = Modifier.padding(top = 8.dp)
-    )
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, top = 8.dp)
+            .padding(top = 12.dp)
+            .background(Color(0xFFF5D37F), RoundedCornerShape(16.dp))
+            .padding(16.dp)
     ) {
-        Text(
-            text = instructions ?: "",
-            fontSize = 18.sp
-        )
+        Column {
+            Text(
+                text = "Instructions",
+                style = TextStyle(textDecoration = TextDecoration.Underline),
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = instructions ?: "",
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+            )
+        }
     }
 }
 
@@ -319,80 +346,54 @@ fun BottomButtons(
             .padding(top = 24.dp)
     ){
         LikeButton(onLikeButtonClick)
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(42.dp))
         DislikeButton(onDislikeButtonClick)
     }
 }
 
 @Composable
 fun DislikeButton(onClick: () -> Unit) {
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(Color.Red, Color.Red, Color.Red)
-    )
-
-    OutlinedButton(
-        onClick = { onClick.invoke() },
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Red
-        ),
-        border = ButtonDefaults.outlinedBorder.copy(
-            width = 3.dp,
-            brush = gradientBrush
-        ),
-        shape = RoundedCornerShape(12.dp),
+    Image(
+        painter = painterResource(R.drawable.ic_dislike),
+        alignment = Alignment.Center,
+        contentDescription = "",
         modifier = Modifier
-            .defaultMinSize(minWidth = 125.dp)
-            .padding(8.dp)
-    ) {
-        Text("DISLIKE")
-    }
+            .size(56.dp)
+            .clickable {
+                onClick.invoke()
+            }
+    )
 }
 
 @Composable
 fun LikeButton(onClick: () -> Unit) {
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(Color.Green, Color.Green, Color.Green)
-    )
-
-    OutlinedButton(
-        onClick = { onClick.invoke() },
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Green
-        ),
-        border = ButtonDefaults.outlinedBorder.copy(
-            width = 3.dp,
-            brush = gradientBrush
-        ),
-        shape = RoundedCornerShape(12.dp),
+    Image(
+        painter = painterResource(R.drawable.ic_like),
+        alignment = Alignment.Center,
+        contentDescription = "",
         modifier = Modifier
-            .defaultMinSize(minWidth = 125.dp)
-            .padding(8.dp)
-    ) {
-        Text("LIKE")
-    }
+            .size(56.dp)
+            .clickable {
+                onClick.invoke()
+            }
+    )
 }
 
 @Composable
 fun MyDrinksButton(onClick: () -> Unit) {
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(Color.Blue, Color.Blue, Color.Blue)
-    )
+    val customBlue = Color(0xFF7FDAF5)
 
-    OutlinedButton(
+    IconButton(
         onClick = { onClick.invoke() },
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Blue
-        ),
-        border = ButtonDefaults.outlinedBorder.copy(
-            width = 3.dp,
-            brush = gradientBrush
-        ),
-        shape = RoundedCornerShape(12.dp),
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .size(56.dp)
+            .background(color = customBlue, shape = CircleShape)
     ) {
-        Text("MY DRINKS")
+        Icon(
+            imageVector = Icons.Filled.List,
+            contentDescription = "Favorite",
+            tint = Color.White
+        )
     }
 }
 
