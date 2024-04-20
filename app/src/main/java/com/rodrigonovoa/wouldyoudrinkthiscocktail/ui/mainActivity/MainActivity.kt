@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -57,7 +55,7 @@ class MainActivity : ComponentActivity() {
     val showDrinkAddedDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel) {
-        viewModel.drinkInserted.collect() {
+        viewModel.drinkInserted.collect {
             if (it) { showDrinkAddedDialog.value = true }
         }
     }
@@ -83,6 +81,7 @@ class MainActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -117,7 +116,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
                 MyDrinksButton({ showSheet = true })
             }
@@ -199,9 +198,14 @@ fun DrinkAddedAlertDialog(onDismissRequest: () -> Unit) {
 
 @Composable
 fun Title() {
+    val style = TextStyle(
+        textAlign = TextAlign.Center,
+        fontSize = 32.sp
+    )
+
     Text(
         text = "Would you drink this cocktail?",
-        fontSize = 20.sp,
+        style = style,
         fontWeight = FontWeight.Bold
     )
 }
@@ -231,46 +235,55 @@ fun CocktailResponseManager(state: ApiResult<DrinksResponse?>) {
 fun Cocktail(data: DrinksResponse) {
     val drink = data.drinks?.get(0)
 
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(drink?.strDrinkThumb)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        error = painterResource(R.drawable.placeholder),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .width(225.dp)
-            .height(225.dp)
-            .padding(top = 16.dp)
-            .clip(CircleShape)
-    )
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(drink?.strDrinkThumb)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            error = painterResource(R.drawable.placeholder),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(225.dp)
+        )
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            DrinkProperty(text = drink?.strCategory)
+
+            DrinkProperty(text = drink?.strAlcoholic)
+        }
+    }
 
     Text(
         text = "${drink?.strDrink}",
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
+        fontSize = 26.sp,
         modifier = Modifier
             .padding(top = 16.dp)
     )
-
-    DrinkProperty(label = "Category", text = drink?.strCategory)
-
-    DrinkProperty(label = "Type", text = drink?.strAlcoholic)
 
     DrinkInstructions(drink?.strInstructions)
 }
 
 @Composable
-fun DrinkProperty(label: String? = null, text: String?, isTitle: Boolean = false) {
-    val style = if (isTitle) TextStyle(fontWeight = FontWeight.Bold) else TextStyle.Default
-    val labelText = if (label != null) "$label: " else ""
-
+fun DrinkProperty(text: String?) {
     Text(
-        text = "$labelText$text",
-        style = style,
+        text = text ?: "",
+        style = TextStyle(fontWeight = FontWeight.Bold),
         fontSize = 16.sp,
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .background(Color.White, shape = RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }
 
@@ -279,7 +292,7 @@ fun DrinkInstructions(instructions: String?) {
     Text(
         text = "Instructions",
         style = TextStyle(textDecoration = TextDecoration.Underline),
-        fontSize = 16.sp,
+        fontSize = 20.sp,
         modifier = Modifier.padding(top = 8.dp)
     )
 
@@ -287,11 +300,11 @@ fun DrinkInstructions(instructions: String?) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(start = 4.dp, top = 8.dp)
     ) {
         Text(
             text = instructions ?: "",
-            fontSize = 16.sp
+            fontSize = 18.sp
         )
     }
 }
@@ -302,7 +315,8 @@ fun BottomButtons(
     onLikeButtonClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(top = 24.dp)
+        modifier = Modifier
+            .padding(top = 24.dp)
     ){
         LikeButton(onLikeButtonClick)
         Spacer(modifier = Modifier.width(16.dp))
