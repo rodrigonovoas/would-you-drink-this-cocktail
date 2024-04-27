@@ -1,12 +1,10 @@
 # Would you drink this cocktail?
 
-
 <p align="center">
-<img src="https://github.com/rodrigonovoas/would-you-drink-this-cocktail/assets/49367885/fb88da6e-5f3c-4ed5-a053-c2bd22af2052" width="250">
+<img src="https://github.com/rodrigonovoas/would-you-drink-this-cocktail/assets/49367885/3908a68a-8cae-416d-8f76-21ecdb34588d" width="250">
 </p>
 
-- Kotlin language
-- Jetpack Compose
+- Kotlin and Jetpack Compose
 - MVVM architecture
 - UseCases
 - Retrofit2 for API calls
