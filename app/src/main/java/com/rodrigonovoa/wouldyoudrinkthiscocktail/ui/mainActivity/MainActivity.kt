@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.airbnb.lottie.compose.*
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
+import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinkResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.ui.StoredDrinksBottomSheet
@@ -91,7 +92,8 @@ class MainActivity : ComponentActivity() {
             detailMode = detailMode,
             viewModel = viewModel,
             state = state,
-            showSheet = { showMyDrinksSheet = true }
+            showSheet = { showMyDrinksSheet = true },
+            onLikeButtonClick = { viewModel.insertDrink(it) }
         )
 
         LottieAnimationManager(
@@ -118,7 +120,8 @@ fun CocktailDetail(
     detailMode: Boolean,
     viewModel: MainActivityViewModel,
     state: ApiResult<DrinksResponse?>,
-    showSheet: () -> Unit
+    showSheet: () -> Unit,
+    onLikeButtonClick: (drink: DrinkResponse?) -> Unit
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -139,16 +142,13 @@ fun CocktailDetail(
                 Title()
             }
 
-            CocktailBody(state)
+            CocktailBody(state, onLikeButtonClick)
 
             Spacer(modifier = Modifier.weight(1f))
 
             if (!detailMode) {
                 BottomButtons(
-                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
-                    onLikeButtonClick = {
-                        viewModel.insertDrink(state.data?.drinks?.get(0))
-                    }
+                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() }
                 )
             }
 
@@ -292,13 +292,16 @@ fun Title() {
 }
 
 @Composable
-fun CocktailBody(state: ApiResult<DrinksResponse?>) {
+fun CocktailBody(
+    state: ApiResult<DrinksResponse?>,
+    onLikeButtonClick: (drink: DrinkResponse?) -> Unit
+) {
     // manage the response from api
     when (state.status) {
         ApiResult.Status.SUCCESS -> {
             state.data?.let {
                 if (it.drinks.isNotEmpty()) {
-                    Cocktail(it)
+                    Cocktail(it, onLikeButtonClick)
                 } else {
                     Text("DRINK UNAVAILABLE")
                 }
@@ -314,7 +317,10 @@ fun CocktailBody(state: ApiResult<DrinksResponse?>) {
 }
 
 @Composable
-fun Cocktail(data: DrinksResponse) {
+fun Cocktail(
+    data: DrinksResponse,
+    onLikeButtonClick: (drink: DrinkResponse?) -> Unit
+) {
     val drink = data.drinks?.get(0)
 
     Box(modifier = Modifier
@@ -358,10 +364,14 @@ fun Cocktail(data: DrinksResponse) {
                         .padding(start = 8.dp, top = 8.dp)
                 )
 
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     DrinkProperty(text = drink?.strCategory)
 
                     DrinkProperty(text = drink?.strAlcoholic)
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    LikeButton({ onLikeButtonClick(drink) })
                 }
             }
         }
@@ -412,15 +422,12 @@ fun DrinkInstructions(instructions: String?) {
 
 @Composable
 fun BottomButtons(
-    onDislikeButtonClick: () -> Unit,
-    onLikeButtonClick: () -> Unit
+    onDislikeButtonClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .padding(top = 24.dp)
     ){
-        LikeButton(onLikeButtonClick)
-        Spacer(modifier = Modifier.width(42.dp))
         DislikeButton(onDislikeButtonClick)
     }
 }
@@ -452,12 +459,13 @@ fun LikeButton(onClick: () -> Unit) {
         alignment = Alignment.Center,
         contentDescription = "",
         modifier = Modifier
-            .size(56.dp)
+            .size(36.dp)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = { onClick.invoke() }
             )
+            .padding(end = 8.dp)
 
     )
 }
