@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,19 +14,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.airbnb.lottie.compose.*
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.R
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.data.api.DrinksResponse
 import com.rodrigonovoa.wouldyoudrinkthiscocktail.repository.ApiResult
@@ -63,11 +60,19 @@ class MainActivity : ComponentActivity() {
     val dbDrinks = viewModel.drinks.collectAsState(initial = listOf()).value
     val showDrinkAddedDialog = remember { mutableStateOf(false) }
 
+    // lottie animations
+    var isPlaying by remember { mutableStateOf(false) }
+    var amount by remember { mutableStateOf(0) }
+
     LaunchedEffect(viewModel) {
         viewModel.drinkInserted.collect {
-            if (it) { showDrinkAddedDialog.value = true }
+            if (it) {
+                amount = amount + 1
+                isPlaying = true
+            }
         }
     }
+
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -123,7 +128,9 @@ class MainActivity : ComponentActivity() {
                 if (!detailModel) {
                     BottomButtons(
                         onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
-                        onLikeButtonClick = { viewModel.insertDrink(state.data?.drinks?.get(0)) }
+                        onLikeButtonClick = {
+                            viewModel.insertDrink(state.data?.drinks?.get(0))
+                        }
                     )
                 }
 
@@ -136,6 +143,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        LottieAnimationManager(
+            isPlaying = isPlaying,
+            amount = amount,
+            showDrinkAddedDialog = showDrinkAddedDialog,
+            stopAnimation = {  isPlaying = false }
+        )
+
         if (showDrinkAddedDialog.value) {
             DrinkAddedAlertDialog(
                 onDismissRequest = {
@@ -144,6 +158,39 @@ class MainActivity : ComponentActivity() {
                     showDrinkAddedDialog.value = false
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun LottieAnimationManager(
+    isPlaying: Boolean,
+    amount: Int,
+    showDrinkAddedDialog: MutableState<Boolean>,
+    stopAnimation: () -> Unit
+) {
+    key(amount) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec.RawRes(R.raw.like_anim)
+        )
+
+        val progress by animateLottieCompositionAsState(
+            composition,
+            isPlaying = isPlaying,
+            speed = 1.2f,
+            restartOnPlay = false,
+            cancellationBehavior = LottieCancellationBehavior.OnIterationFinish
+        )
+
+        LaunchedEffect(progress) {
+            if (progress >= 0.8f && isPlaying) {
+                stopAnimation.invoke()
+                showDrinkAddedDialog.value = true
+            }
+        }
+
+        if (isPlaying) {
+            LottieAnimation(composition = composition, progress = progress)
         }
     }
 }
@@ -353,38 +400,49 @@ fun BottomButtons(
 
 @Composable
 fun DislikeButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Image(
         painter = painterResource(R.drawable.ic_dislike),
         alignment = Alignment.Center,
         contentDescription = "",
         modifier = Modifier
             .size(56.dp)
-            .clickable {
-                onClick.invoke()
-            }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { onClick.invoke() }
+            )
     )
 }
 
 @Composable
 fun LikeButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Image(
         painter = painterResource(R.drawable.ic_like),
         alignment = Alignment.Center,
         contentDescription = "",
         modifier = Modifier
             .size(56.dp)
-            .clickable {
-                onClick.invoke()
-            }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { onClick.invoke() }
+            )
+
     )
 }
 
 @Composable
 fun MyDrinksButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
     val customBlue = Color(0xFF7FDAF5)
 
     IconButton(
         onClick = { onClick.invoke() },
+        interactionSource = interactionSource,
         modifier = Modifier
             .size(56.dp)
             .background(color = customBlue, shape = CircleShape)
