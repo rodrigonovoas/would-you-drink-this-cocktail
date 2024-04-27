@@ -147,9 +147,7 @@ fun CocktailDetail(
             Spacer(modifier = Modifier.weight(1f))
 
             if (!detailMode) {
-                BottomButtons(
-                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() }
-                )
+                ReloadButton({ viewModel.getDrinkFromAPI() })
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -421,23 +419,11 @@ fun DrinkInstructions(instructions: String?) {
 }
 
 @Composable
-fun BottomButtons(
-    onDislikeButtonClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .padding(top = 24.dp)
-    ){
-        DislikeButton(onDislikeButtonClick)
-    }
-}
-
-@Composable
-fun DislikeButton(onClick: () -> Unit) {
+fun ReloadButton(onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
 
     Image(
-        painter = painterResource(R.drawable.ic_dislike),
+        painter = painterResource(R.drawable.ic_reload),
         alignment = Alignment.Center,
         contentDescription = "",
         modifier = Modifier
