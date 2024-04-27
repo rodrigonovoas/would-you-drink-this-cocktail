@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
 @Composable
  fun BaseView(viewModel: MainActivityViewModel = koinViewModel()) {
     val state = viewModel.drink.collectAsState(initial = ApiResult.loading()).value
-    val detailModel = viewModel.detailMode.collectAsState(initial = false).value
+    val detailMode = viewModel.detailMode.collectAsState(initial = false).value
     val dbDrinks = viewModel.drinks.collectAsState(initial = listOf()).value
     val showDrinkAddedDialog = remember { mutableStateOf(false) }
 
@@ -64,6 +64,7 @@ class MainActivity : ComponentActivity() {
     var isPlaying by remember { mutableStateOf(false) }
     var amount by remember { mutableStateOf(0) }
 
+    // observe when drink has been inserted
     LaunchedEffect(viewModel) {
         viewModel.drinkInserted.collect {
             if (it) {
@@ -78,70 +79,22 @@ class MainActivity : ComponentActivity() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        var showSheet by remember { mutableStateOf(false) }
+        var showMyDrinksSheet by remember { mutableStateOf(false) }
 
-        if (showSheet) {
+        if (showMyDrinksSheet) {
             StoredDrinksBottomSheet(
                 dbDrinks,
-                onDismiss = { showSheet = false},
+                onDismiss = { showMyDrinksSheet = false },
                 onDrinkSelected = { viewModel.loadDrink(it) }
             )
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (detailModel) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        IconButton(onClick = {
-                            viewModel.closeDetailMode()
-                            viewModel.loadLastDrink()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = "Close"
-                            )
-                        }
-                    }
-                }
-
-                if (!detailModel) {
-                    Title()
-                }
-
-                CocktailResponseManager(state)
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (!detailModel) {
-                    BottomButtons(
-                        onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
-                        onLikeButtonClick = {
-                            viewModel.insertDrink(state.data?.drinks?.get(0))
-                        }
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    MyDrinksButton({ showSheet = true })
-                }
-            }
-        }
+        CocktailDetail(
+            detailMode = detailMode,
+            viewModel = viewModel,
+            state = state,
+            showSheet = { showMyDrinksSheet = true }
+        )
 
         LottieAnimationManager(
             isPlaying = isPlaying,
@@ -161,6 +114,74 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@Composable
+fun CocktailDetail(
+    detailMode: Boolean,
+    viewModel: MainActivityViewModel,
+    state: ApiResult<DrinksResponse?>,
+    showSheet: () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            if (detailMode) {
+                DetailHeader(viewModel = viewModel)
+            } else {
+                Title()
+            }
+
+            CocktailBody(state)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (!detailMode) {
+                BottomButtons(
+                    onDislikeButtonClick = { viewModel.getDrinkFromAPI() },
+                    onLikeButtonClick = {
+                        viewModel.insertDrink(state.data?.drinks?.get(0))
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // set MyDrinks button to the right side of the screen
+            Row {
+                Spacer(modifier = Modifier.weight(1f))
+                MyDrinksButton({ showSheet.invoke() })
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailHeader(viewModel: MainActivityViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        IconButton(onClick = {
+            viewModel.closeDetailMode()
+            viewModel.loadLastDrink()
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close"
+            )
+        }
+    }
+}
+
 
 @Composable
 fun LottieAnimationManager(
@@ -272,7 +293,8 @@ fun Title() {
 }
 
 @Composable
-fun CocktailResponseManager(state: ApiResult<DrinksResponse?>) {
+fun CocktailBody(state: ApiResult<DrinksResponse?>) {
+    // manage the response from api
     when (state.status) {
         ApiResult.Status.SUCCESS -> {
             state.data?.let {
