@@ -347,20 +347,25 @@ fun Cocktail(data: DrinksResponse) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .background(Color.White.copy(alpha = 0.6f) , shape = RoundedCornerShape(8.dp))
         ) {
-            DrinkProperty(text = drink?.strCategory)
+            Column {
+                Text(
+                    text = "${drink?.strDrink}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .padding(start = 8.dp, top = 8.dp)
+                )
 
-            DrinkProperty(text = drink?.strAlcoholic)
+                Row {
+                    DrinkProperty(text = drink?.strCategory)
+
+                    DrinkProperty(text = drink?.strAlcoholic)
+                }
+            }
         }
     }
-
-    Text(
-        text = "${drink?.strDrink}",
-        fontWeight = FontWeight.Bold,
-        fontSize = 26.sp,
-        modifier = Modifier
-            .padding(top = 16.dp)
-    )
 
     DrinkInstructions(drink?.strInstructions)
 }
@@ -370,11 +375,11 @@ fun DrinkProperty(text: String?) {
     Text(
         text = text ?: "",
         style = TextStyle(fontWeight = FontWeight.Bold),
-        fontSize = 16.sp,
+        fontSize = 12.sp,
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .background(Color.White, shape = RoundedCornerShape(12.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
     )
 }
 
@@ -385,7 +390,7 @@ fun DrinkInstructions(instructions: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp)
-            .background(Color(0xFFF5D37F), RoundedCornerShape(16.dp))
+            // .background(Color(0xFFF5D37F).copy(alpha = 0.3f), RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Column {
@@ -397,9 +402,9 @@ fun DrinkInstructions(instructions: String?) {
 
             Text(
                 text = instructions ?: "",
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(top = 8.dp)
+                    .padding(top = 12.dp)
             )
         }
     }

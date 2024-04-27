@@ -62,7 +62,8 @@ fun StoredDrinksBottomSheet(
                             .crossfade(true)
                             .build(),
                         contentDescription = null,
-                        error = painterResource(R.drawable.placeholder),
+                        placeholder = painterResource(R.drawable.loading_placeholder),
+                        // error = painterResource(R.drawable.placeholder),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .width(32.dp)
