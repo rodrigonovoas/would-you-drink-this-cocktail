@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -124,16 +122,17 @@ fun CocktailDetail(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             if (detailMode) {
                 DetailHeader(viewModel = viewModel)
             } else {
@@ -328,7 +327,8 @@ fun Cocktail(data: DrinksResponse) {
                 .crossfade(true)
                 .build(),
             contentDescription = null,
-            error = painterResource(R.drawable.placeholder),
+            placeholder = painterResource(R.drawable.loading_placeholder),
+            // error = painterResource(R.drawable.loading_placeholder),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(225.dp)
