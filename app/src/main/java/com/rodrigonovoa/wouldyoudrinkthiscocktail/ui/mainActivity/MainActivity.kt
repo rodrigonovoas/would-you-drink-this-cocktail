@@ -142,7 +142,7 @@ fun CocktailDetail(
                 Title()
             }
 
-            CocktailBody(state, onLikeButtonClick)
+            CocktailBody(detailMode, state, onLikeButtonClick)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -291,6 +291,7 @@ fun Title() {
 
 @Composable
 fun CocktailBody(
+    detailMode: Boolean,
     state: ApiResult<DrinksResponse?>,
     onLikeButtonClick: (drink: DrinkResponse?) -> Unit
 ) {
@@ -299,7 +300,7 @@ fun CocktailBody(
         ApiResult.Status.SUCCESS -> {
             state.data?.let {
                 if (it.drinks.isNotEmpty()) {
-                    Cocktail(it, onLikeButtonClick)
+                    Cocktail(detailMode, it, onLikeButtonClick)
                 } else {
                     Text("DRINK UNAVAILABLE")
                 }
@@ -316,6 +317,7 @@ fun CocktailBody(
 
 @Composable
 fun Cocktail(
+    detailMode: Boolean,
     data: DrinksResponse,
     onLikeButtonClick: (drink: DrinkResponse?) -> Unit
 ) {
@@ -367,9 +369,11 @@ fun Cocktail(
 
                     DrinkProperty(text = drink?.strAlcoholic)
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    if (!detailMode) {
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    LikeButton({ onLikeButtonClick(drink) })
+                        LikeButton({ onLikeButtonClick(drink) })
+                    }
                 }
             }
         }
